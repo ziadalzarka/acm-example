@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Container, Alert, FormGroup, Label, Input } from "reactstrap";
+import firebase from "firebase";
 import "./App.css";
 
 function App() {
@@ -21,6 +22,34 @@ function App() {
     [message, messages]
   );
 
+  const updateOnNewChild = useCallback(
+    (text) => {
+      setMessages([...messages, text]);
+    },
+    [messages]
+  );
+
+  useEffect(() => {
+    const firebaseConfig = {
+      apiKey: "AIzaSyC4mZ2myFoL_mocKYQ2pRv3NGowrvv7Kbo",
+      authDomain: "acm-example.firebaseapp.com",
+      projectId: "acm-example",
+      storageBucket: "acm-example.appspot.com",
+      messagingSenderId: "804074064637",
+      appId: "1:804074064637:web:e95c0e2c0c1135028d0c94",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    firebase
+      .database()
+      .ref("/messages")
+      .on("child_added", (childSnapshot) => {
+        const childData = childSnapshot.val();
+        updateOnNewChild(childData);
+      });
+  }, []);
+
   return (
     <Container className="py-4">
       <FormGroup>
@@ -36,7 +65,9 @@ function App() {
         />
       </FormGroup>
       {messages.map((text) => (
-        <Alert color="secondary">{text}</Alert>
+        <Alert color="secondary" key={text}>
+          {text}
+        </Alert>
       ))}
     </Container>
   );
