@@ -1,24 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import { useCallback, useState } from "react";
+import { Container, Alert, FormGroup, Label, Input } from "reactstrap";
+import "./App.css";
 
 function App() {
+  const [message, setMessage] = useState("");
+
+  const [messages, setMessages] = useState([]);
+
+  const handleChange = useCallback((event) => {
+    setMessage(event.target.value);
+  }, []);
+
+  const handleKeyPress = useCallback(
+    (event) => {
+      if (event.key === "Enter") {
+        setMessages([...messages, message]);
+        setMessage("");
+      }
+    },
+    [message, messages]
+  );
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container className="py-4">
+      <FormGroup>
+        <Label for="message">Write a message</Label>
+        <Input
+          type="text"
+          name="message"
+          id="message"
+          placeholder="Say hello!"
+          value={message}
+          onChange={handleChange}
+          onKeyPress={handleKeyPress}
+        />
+      </FormGroup>
+      {messages.map((text) => (
+        <Alert color="secondary">{text}</Alert>
+      ))}
+    </Container>
   );
 }
 
